@@ -1,5 +1,6 @@
-package com.fm6mhz.auth.config;
+package com.fm6mhz.auth.infrastructure.config;
 
+import com.fm6mhz.auth.infrastructure.utils.KeyPairHelper;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -32,8 +33,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
@@ -41,21 +40,13 @@ import java.util.UUID;
 @Configuration
 public class SecurityConfig {
 
-    private static KeyPair generateRsaKey() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            keyPair = keyPairGenerator.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-        return keyPair;
-    }
+    private static final int KEY_PAIR_KEY_SIZE = 2048;
+    private static final String KEY_PAIR_ALGORITHM_RSA = "RSA";
 
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .oidc(Customizer.withDefaults());
@@ -116,7 +107,7 @@ public class SecurityConfig {
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = generateRsaKey();
+        KeyPair keyPair = KeyPairHelper.generateRsaKey(KEY_PAIR_ALGORITHM_RSA, KEY_PAIR_KEY_SIZE);
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
