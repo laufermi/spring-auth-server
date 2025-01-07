@@ -17,7 +17,7 @@
 
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
-        <property name="max" value="160"/>
+        <property name="max" value="200"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
 
@@ -25,7 +25,16 @@
         <property name="max" value="800"/>
     </module>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/config/suppressions.xml"/>
+        <property name="optional" value="false"/>
+    </module>
+
     <module name="TreeWalker">
+        <!--Length-->
+        <module name="MethodLength">
+            <property name="max" value="30"/>
+        </module>
         <!--Imports-->
         <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
@@ -91,3 +100,4 @@
         <module name="MethodTypeParameterName"/>
     </module>
 </module>
+
